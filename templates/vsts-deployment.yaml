@@ -1,0 +1,57 @@
+{{- if .Values.vsts.enabled -}}
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: {{ template "vstsbuild.fullname" . }}-agent
+  labels:
+    app: {{ template "vstsbuild.name" . }}-agent
+    chart: {{ template "vstsbuild.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.vsts.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ template "vstsbuild.name" . }}-agent
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "vstsbuild.name" . }}-agent
+        release: {{ .Release.Name }}
+      annotations:
+        config: {{ include (print $.Template.BasePath "/vsts-configmap.yaml") . | sha256sum }}
+        secret: {{ include (print $.Template.BasePath "/vsts-secret.yaml") . | sha256sum }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}-agent
+          image: "{{ .Values.vsts.repository }}:{{ .Values.vsts.tag }}"
+          imagePullPolicy: {{ .Values.vsts.pullPolicy }}
+          envFrom:
+            - configMapRef:
+                name: {{ template "vstsbuild.fullname" . }}-agent
+            - secretRef:
+                name: {{ template "vstsbuild.fullname" . }}-agent
+          volumeMounts:
+            - mountPath: /var/run/docker.sock
+              name: host-docker-socket
+          resources:
+{{ toYaml .Values.vsts.resources | indent 12 }}
+    {{- with .Values.vsts.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.vsts.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.vsts.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+      volumes:
+        - name: host-docker-socket
+          hostPath:
+            path: /var/run/docker.sock
+{{- end }}
+

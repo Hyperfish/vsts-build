@@ -1,0 +1,15 @@
+{{- if .Values.vsts.enabled -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "vstsbuild.fullname" . }}-agent
+  labels:
+    app: {{ template "vstsbuild.name" . }}
+    chart: {{ template "vstsbuild.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+data:
+{{- range $key, $val := .Values.vsts.configMap }}
+  {{ $key }}: {{ default "" $val | quote }}
+{{- end }}
+{{- end }}

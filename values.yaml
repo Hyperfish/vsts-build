@@ -1,0 +1,16 @@
+
+vsts:
+  enabled: true
+  repository: microsoft/vsts-agent
+  tag: "ubuntu-16.04-docker-17.12.0-ce-standard"
+  replicaCount: 1
+  pullPolicy: IfNotPresent
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  # env vars
+  configMap:
+    VSTS_ACCOUNT: ""
+    VSTS_POOL: "DefaultLinux"
+  secret:
+    VSTS_TOKEN: ""
