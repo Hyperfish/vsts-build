@@ -1,4 +1,4 @@
-# VSTS build agent Helm chart for Kubernetes
+# DEPRECATED - VSTS build agent Helm chart for Kubernetes
 
 A [helm](https://helm.sh/) chart for the [VSTS](https://visualstudio.microsoft.com/team-services/) linux build agent. 
 
